@@ -294,8 +294,8 @@ appsettings.Development.json
 # AI/ML Tools
 ###################
 
-# Serena AI Assistant - INCLUDE this folder
-!.serena/
+# Serena AI Assistant - ignore entire folder
+.serena/
 
 ###################
 # Other Generated Files
