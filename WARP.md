@@ -310,6 +310,36 @@ gh pr review <pr-number> --approve
 gh pr merge <pr-number> --squash
 ```
 
+### Complex Command Workarounds
+**For complex PR descriptions or multi-line commands, use file-based approaches:**
+
+```bash
+# Create PR with complex body - use file approach
+echo "Closes #42
+
+Detailed multi-line description
+with formatting and examples..." > /tmp/pr_body.md
+gh pr create --base develop --title "feat: description" --body-file /tmp/pr_body.md
+
+# Edit existing PR with complex body
+echo "Updated description..." > /tmp/pr_update.md
+gh pr edit <pr-number> --body-file /tmp/pr_update.md
+
+# Multi-line commit messages
+echo "feat(scope): add feature
+
+- Detailed change 1
+- Detailed change 2
+- Implementation notes" > /tmp/commit_msg.txt
+git commit -F /tmp/commit_msg.txt
+```
+
+**Why use files:**
+- Avoids shell escaping issues with quotes, newlines, and special characters
+- Enables complex formatting (markdown, code blocks, lists)
+- Prevents getting stuck in interactive shells
+- Allows editing complex text in preferred editor
+
 ## Environment Configuration
 
 ### Development Environments
