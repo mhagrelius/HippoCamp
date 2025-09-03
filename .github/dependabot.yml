@@ -1,0 +1,78 @@
+version: 2
+updates:
+  # .NET NuGet packages
+  - package-ecosystem: "nuget"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/New_York"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "mhagrelius"  # Replace with your GitHub username if different
+    labels:
+      - "dependencies"
+      - "nuget"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    # Group Microsoft packages together to reduce PR noise
+    groups:
+      microsoft-packages:
+        patterns:
+          - "Microsoft.*"
+          - "System.*"
+        update-types:
+          - "minor"
+          - "patch"
+      aspire-packages:
+        patterns:
+          - "Aspire.*"
+        update-types:
+          - "minor"
+          - "patch"
+      testing-packages:
+        patterns:
+          - "xunit*"
+          - "Microsoft.NET.Test.*"
+          - "FluentAssertions*"
+          - "Moq*"
+          - "coverlet*"
+        update-types:
+          - "minor"
+          - "patch"
+
+  # .NET SDK updates via global.json
+  - package-ecosystem: "dotnet-sdk"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "09:00"
+      timezone: "America/New_York"
+    reviewers:
+      - "mhagrelius"  # Replace with your GitHub username if different
+    labels:
+      - "dependencies"
+      - "dotnet-sdk"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/.github"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+      time: "09:00"
+      timezone: "America/New_York"
+    reviewers:
+      - "mhagrelius"  # Replace with your GitHub username if different
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
