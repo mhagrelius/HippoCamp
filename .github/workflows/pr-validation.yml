@@ -2,14 +2,16 @@ name: PR Validation
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, edited]
+    types: [opened, synchronize, reopened]
+  merge_group:
+    types: [checks_requested]
 
 permissions:
   contents: read
   pull-requests: read
 
 jobs:
-  conventional-commits:
+  commitlint:
     name: Validate Conventional Commits
     runs-on: ubuntu-latest
     steps:
@@ -18,29 +20,17 @@ jobs:
       with:
         fetch-depth: 0
     
-    - name: Conventional Commitlint
-      uses: opensource-nepal/commitlint@v1
+    - name: Lint Commit Messages
+      uses: wagoid/commitlint-github-action@v6
       with:
-        fail_on_error: true
-        verbose: true
-
-  branch-naming:
-    name: Validate Branch Naming
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    
-    - name: Validate Git-Flow Branch Name
-      uses: KinsonDigital/BranchValidator@v1.0.0-preview.4
-      with:
-        branch-name: ${{ github.head_ref }}
-        validation-logic: "equalTo('feature/*') || equalTo('feat/*') || equalTo('bugfix/*') || equalTo('fix/*') || equalTo('hotfix/*') || equalTo('develop')"
-        fail-when-not-valid: true
+        configFile: commitlint.config.mjs
+        failOnWarnings: false
+        failOnErrors: true
 
   git-flow-validation:
     name: Validate Git-Flow Rules
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
     steps:
     - name: Check Branch Strategy Compliance
       run: |
@@ -48,57 +38,38 @@ jobs:
         echo "Source branch: ${{ github.head_ref }}"
         echo "Target branch: ${{ github.base_ref }}"
         
-        # Block direct PRs to main (should come from develop)
-        if [[ "${{ github.base_ref }}" == "main" && "${{ github.head_ref }}" != "develop" ]]; then
-          echo "❌ Direct PRs to 'main' are not allowed!"
-          echo "💡 Follow git-flow: merge to 'develop' first, then create release PR from 'develop' to 'main'"
-          exit 1
+        # Block direct PRs to main (except from develop or hotfix branches)
+        if [[ "${{ github.base_ref }}" == "main" ]]; then
+          if [[ "${{ github.head_ref }}" == "develop" ]]; then
+            echo "✅ Release PR from develop to main - allowed"
+          elif [[ "${{ github.head_ref }}" =~ ^hotfix/.+ ]]; then
+            echo "✅ Emergency hotfix PR to main - allowed"
+          else
+            echo "❌ Direct PRs to 'main' are not allowed!"
+            echo "💡 Follow git-flow: use 'develop' for releases or 'hotfix/' for emergency fixes"
+            exit 1
+          fi
         fi
         
         echo "✅ Git-flow branch strategy is valid"
 
-  merge-strategy-guidance:
-    name: Merge Strategy Guidance
+  build-and-test:
+    name: Build and Test
     runs-on: ubuntu-latest
-    steps:
-    - name: Provide Merge Strategy Recommendations
-      run: |
-        echo "## 🔄 Merge Strategy Guidance" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "**Branch**: \`${{ github.head_ref }}\` → \`${{ github.base_ref }}\`" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        
-        if [[ "${{ github.base_ref }}" == "develop" ]]; then
-          echo "### 🔄 Use \"Squash and merge\"" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Keeps develop history clean" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Combines all feature commits into one" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Makes git log more readable" >> $GITHUB_STEP_SUMMARY
-        elif [[ "${{ github.base_ref }}" == "main" ]]; then
-          echo "### 🔀 Use \"Create a merge commit\"" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Preserves develop branch history" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Shows release boundaries clearly" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Makes releases easy to track" >> $GITHUB_STEP_SUMMARY
-        fi
-        
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "### 📋 Pre-merge Checklist" >> $GITHUB_STEP_SUMMARY
-        echo "- [ ] All commits follow conventional format" >> $GITHUB_STEP_SUMMARY
-        echo "- [ ] Branch name follows git-flow convention" >> $GITHUB_STEP_SUMMARY
-        echo "- [ ] Correct merge strategy selected" >> $GITHUB_STEP_SUMMARY
-        echo "- [ ] No secrets or credentials committed" >> $GITHUB_STEP_SUMMARY
-
-  clean-history-check:
-    name: Check for Merge Commits in PR
-    runs-on: ubuntu-latest
-    if: github.base_ref == 'develop'
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
       with:
-        fetch-depth: 0
-    
-    - name: Forbid Merge Commits in Feature Branches
-      uses: motlin/forbid-merge-commits-action@main
-      with:
-        fail-on-merge-commits: 'true'
-        fail-notice: 'Feature branches should have clean history. Use rebase instead of merge to update your branch. See: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork'
+        dotnet-version: '9.0.x'
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build solution
+      run: dotnet build --no-restore --configuration Release
+      
+    - name: Run tests
+      run: dotnet test --no-build --configuration Release --verbosity normal
