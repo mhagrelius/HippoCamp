@@ -45,14 +45,12 @@ We follow **Git-flow** with **issue-linked branches** for better traceability:
 
 ```bash
 # 🎯 Start new feature (linked to GitHub issue)
+# Note: Features include new functionality AND non-urgent bug fixes
 git checkout develop && git pull
 git checkout -b feature/#{issue-number}-{short-description}
 
-# 🐛 Bug fix (linked to GitHub issue) - non-urgent fixes
-git checkout develop && git pull
-git checkout -b bugfix/#{issue-number}-{short-description}
-
-# 🚨 Emergency hotfix (linked to GitHub issue) - urgent production fixes
+# 🚨 Emergency hotfix (linked to GitHub issue)
+# Note: Only for urgent production fixes that can't wait for next release
 git checkout main && git pull
 git checkout -b hotfix/#{issue-number}-{short-description}
 ```
@@ -60,12 +58,12 @@ git checkout -b hotfix/#{issue-number}-{short-description}
 #### Branch Naming Examples
 ```bash
 feature/15-user-authentication      # New feature
-bugfix/23-login-validation-error    # Non-urgent bug fix
+feature/23-fix-login-validation     # Non-urgent bug fix
 hotfix/42-critical-security-patch   # Emergency production fix
 ```
 
 **Branch Targeting**:
-- `feature/*` and `bugfix/*` → target `develop` branch
+- `feature/*` → target `develop` branch
 - `hotfix/*` → target `main` branch (then sync back to develop)
 
 ### Commit Conventions
@@ -170,16 +168,20 @@ aspire run                 # Run Aspire application stack
 
 ### Git Workflow
 ```bash
-# Start new work
+# Start new work (features and non-urgent fixes)
 git checkout develop && git pull
 git checkout -b feature/#{issue}-{name}
 
+# Emergency hotfix
+git checkout main && git pull
+git checkout -b hotfix/#{issue}-{name}
+
 # Daily workflow
 git add .
-git commit -m "feat: implement feature"
+git commit -m "feat: implement feature"  # or "fix: resolve bug"
 git push -u origin feature/#{issue}-{name}
 
-# Create PR
+# Create PR (target develop for features, main for hotfixes)
 gh pr create --base develop --title "feat: feature name" --body "Closes ##{issue}"
 ```
 
