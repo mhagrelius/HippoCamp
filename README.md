@@ -48,19 +48,25 @@ We follow **Git-flow** with **issue-linked branches** for better traceability:
 git checkout develop && git pull
 git checkout -b feature/#{issue-number}-{short-description}
 
-# 🐛 Bug fix (linked to GitHub issue)
+# 🐛 Bug fix (linked to GitHub issue) - non-urgent fixes
+git checkout develop && git pull
 git checkout -b bugfix/#{issue-number}-{short-description}
 
-# 🚨 Hotfix (linked to GitHub issue)
+# 🚨 Emergency hotfix (linked to GitHub issue) - urgent production fixes
+git checkout main && git pull
 git checkout -b hotfix/#{issue-number}-{short-description}
 ```
 
 #### Branch Naming Examples
 ```bash
-feature/15-user-authentication
-bugfix/23-login-validation-error
-hotfix/42-security-patch
+feature/15-user-authentication      # New feature
+bugfix/23-login-validation-error    # Non-urgent bug fix
+hotfix/42-critical-security-patch   # Emergency production fix
 ```
+
+**Branch Targeting**:
+- `feature/*` and `bugfix/*` → target `develop` branch
+- `hotfix/*` → target `main` branch (then sync back to develop)
 
 ### Commit Conventions
 
