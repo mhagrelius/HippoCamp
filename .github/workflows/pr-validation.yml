@@ -53,6 +53,14 @@ jobs:
         
         echo "✅ Git-flow branch strategy is valid"
 
+  forbid-merge-commits:
+    name: Forbid Merge Commits in PRs
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.base_ref != 'main'
+    steps:
+    - name: Forbid merge commits
+      uses: motlin/forbid-merge-commits-action@main
+
   build-and-test:
     name: Build and Test
     runs-on: ubuntu-latest

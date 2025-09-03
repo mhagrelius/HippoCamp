@@ -1,8 +1,9 @@
 # Pull Request Template
 
 > **Merge Strategy Reminder:**
-> - **Feature/Bugfix → `develop`**: Use "Squash and merge" 
-> - **`develop` → `main`**: Use "Create a merge commit"
+> - **Feature → `develop`**: Use "Squash and merge" 
+> - **Hotfix → `main`**: Use "Squash and merge"
+> - **`develop` → `main`**: Use "Create a merge commit" (releases only)
 > 
 > Use Conventional Commits in the title (e.g., `feat: add user authentication`, `fix(auth): resolve login issue`).
 
@@ -29,8 +30,10 @@
 
 ## Git-Flow Compliance
 - [ ] Feature branches target `develop` (not `main`)
+- [ ] Hotfix branches target `main` (emergency fixes only)
 - [ ] Release PRs are from `develop` to `main`
-- [ ] Branch follows naming convention (feature/, bugfix/, hotfix/)
+- [ ] Branch follows naming convention (feature/, hotfix/)
+- [ ] Issue number referenced in branch name (e.g., feature/15-description)
 
 ## Additional Notes
 - Architecture decisions, follow-ups, or out-of-scope items
