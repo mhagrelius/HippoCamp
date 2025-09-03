@@ -38,15 +38,34 @@ jobs:
         echo "Source branch: ${{ github.head_ref }}"
         echo "Target branch: ${{ github.base_ref }}"
         
-        # Block direct PRs to main (except from develop or hotfix branches)
+        # Validate Git-flow branch targeting patterns
+        echo "🔍 Source: ${{ github.head_ref }} → Target: ${{ github.base_ref }}"
+        
         if [[ "${{ github.base_ref }}" == "main" ]]; then
+          # PRs to main: only from develop (releases) or hotfix/* (emergencies)
           if [[ "${{ github.head_ref }}" == "develop" ]]; then
             echo "✅ Release PR from develop to main - allowed"
           elif [[ "${{ github.head_ref }}" =~ ^hotfix/.+ ]]; then
             echo "✅ Emergency hotfix PR to main - allowed"
+          elif [[ "${{ github.head_ref }}" =~ ^release/.+ ]]; then
+            echo "✅ Release branch PR to main - allowed"
           else
-            echo "❌ Direct PRs to 'main' are not allowed!"
-            echo "💡 Follow git-flow: use 'develop' for releases or 'hotfix/' for emergency fixes"
+            echo "❌ Invalid PR to main!"
+            echo "💡 Only allowed: develop (releases), hotfix/* (emergencies), release/* (release prep)"
+            exit 1
+          fi
+        elif [[ "${{ github.base_ref }}" == "develop" ]]; then
+          # PRs to develop: only from feature/* 
+          if [[ "${{ github.head_ref }}" =~ ^feature/.+ ]]; then
+            echo "✅ Feature branch targeting develop - allowed"
+          elif [[ "${{ github.head_ref }}" =~ ^release/.+ ]]; then
+            echo "✅ Release branch back-merge to develop - allowed"
+          elif [[ "${{ github.head_ref }}" =~ ^hotfix/.+ ]]; then
+            echo "✅ Hotfix back-merge to develop - allowed"
+          else
+            echo "❌ Invalid branch name for develop target!"
+            echo "💡 Use 'feature/#{issue}-description' for features"
+            echo "📋 Invalid branch: ${{ github.head_ref }}"
             exit 1
           fi
         fi
