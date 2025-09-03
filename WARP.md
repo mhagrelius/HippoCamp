@@ -208,6 +208,32 @@ refactor: improve code structure
 chore: update dependencies
 ```
 
+### Commit Best Practices
+**Prefer small, focused commits over large all-encompassing ones:**
+
+```bash
+# ✅ Good: Small, focused commits
+git commit -m "feat(auth): add JWT token validation"
+git commit -m "test(auth): add JWT validation tests"
+git commit -m "docs(auth): update authentication README"
+
+# ❌ Bad: Large, unfocused commit
+git commit -m "feat: add complete authentication system with tests and docs"
+```
+
+**Benefits of small commits:**
+- Easier code review and debugging
+- Clearer git history and blame information
+- Safer to revert specific changes
+- Better CI/CD feedback loop
+- Simplified merge conflict resolution
+
+**Grouping Guidelines:**
+- Group related file types (tests with tests, docs with docs)
+- Separate feature implementation from configuration changes
+- Keep refactoring separate from new features
+- Commit formatting/style changes independently
+
 ## Troubleshooting
 
 ### Common Issues
