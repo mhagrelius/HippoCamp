@@ -218,10 +218,6 @@ healthchecksdb
 # Docker
 ###################
 
-# Docker build context
-.dockerignore
-Dockerfile.dockerignore
-
 ###################
 # Node.js (for frontend assets)
 ###################
