@@ -38,34 +38,41 @@ jobs:
         echo "Source branch: ${{ github.head_ref }}"
         echo "Target branch: ${{ github.base_ref }}"
         
+    - name: Check Branch Strategy Compliance
+      env:
+        HEAD_REF: ${{ github.head_ref }}
+        BASE_REF: ${{ github.base_ref }}
+      run: |
         # Validate Git-flow branch targeting patterns
-        echo "🔍 Source: ${{ github.head_ref }} → Target: ${{ github.base_ref }}"
-        
-        if [[ "${{ github.base_ref }}" == "main" ]]; then
+        HEAD_REF="${HEAD_REF:?}"
+        BASE_REF="${BASE_REF:?}"
+        echo "🔍 Source: ${HEAD_REF} → Target: ${BASE_REF}"
+
+        if [[ "${BASE_REF}" == "main" ]]; then
           # PRs to main: only from develop (releases) or hotfix/* (emergencies)
-          if [[ "${{ github.head_ref }}" == "develop" ]]; then
+          if [[ "${HEAD_REF}" == "develop" ]]; then
             echo "✅ Release PR from develop to main - allowed"
-          elif [[ "${{ github.head_ref }}" =~ ^hotfix/.+ ]]; then
+          elif [[ "${HEAD_REF}" =~ ^hotfix/.+ ]]; then
             echo "✅ Emergency hotfix PR to main - allowed"
-          elif [[ "${{ github.head_ref }}" =~ ^release/.+ ]]; then
+          elif [[ "${HEAD_REF}" =~ ^release/.+ ]]; then
             echo "✅ Release branch PR to main - allowed"
           else
             echo "❌ Invalid PR to main!"
             echo "💡 Only allowed: develop (releases), hotfix/* (emergencies), release/* (release prep)"
             exit 1
           fi
-        elif [[ "${{ github.base_ref }}" == "develop" ]]; then
+        elif [[ "${BASE_REF}" == "develop" ]]; then
           # PRs to develop: only from feature/* 
-          if [[ "${{ github.head_ref }}" =~ ^feature/.+ ]]; then
+          if [[ "${HEAD_REF}" =~ ^feature/.+ ]]; then
             echo "✅ Feature branch targeting develop - allowed"
-          elif [[ "${{ github.head_ref }}" =~ ^release/.+ ]]; then
+          elif [[ "${HEAD_REF}" =~ ^release/.+ ]]; then
             echo "✅ Release branch back-merge to develop - allowed"
-          elif [[ "${{ github.head_ref }}" =~ ^hotfix/.+ ]]; then
+          elif [[ "${HEAD_REF}" =~ ^hotfix/.+ ]]; then
             echo "✅ Hotfix back-merge to develop - allowed"
           else
             echo "❌ Invalid branch name for develop target!"
             echo "💡 Use 'feature/#{issue}-description' for features"
-            echo "📋 Invalid branch: ${{ github.head_ref }}"
+            echo "📋 Invalid branch: ${HEAD_REF}"
             exit 1
           fi
         fi
