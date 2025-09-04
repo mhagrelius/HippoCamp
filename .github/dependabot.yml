@@ -3,6 +3,7 @@ updates:
   # .NET NuGet packages
   - package-ecosystem: "nuget"
     directory: "/"
+    target-branch: "develop"
     schedule:
       interval: "weekly"
       day: "monday"
@@ -42,7 +43,6 @@ updates:
         update-types:
           - "minor"
           - "patch"
-
   # .NET SDK updates via global.json
   - package-ecosystem: "dotnet-sdk"
     directory: "/"
