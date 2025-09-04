@@ -290,8 +290,9 @@ dotnet list package --vulnerable
 # Update all packages to latest compatible versions
 dotnet list package --outdated | grep ">" | cut -d">" -f2 | xargs -I {} dotnet add package {}
 
-# Update specific package
-dotnet add package Microsoft.AspNetCore.App --version 9.0.0
+# Update a specific package (example)
+dotnet add package Microsoft.AspNetCore.Http.Abstractions --version 9.0.0
+# To move frameworks, upgrade TargetFramework in the .csproj (e.g., net9.0) rather than adding shared frameworks as packages.
 
 # Remove unused package references
 dotnet list package --include-transitive | grep "Auto-referenced"
