@@ -1,10 +1,17 @@
 using Microsoft.Extensions.Logging;
 
-namespace HippoCamp.Tests.Tests;
+namespace HippoCamp.Tests;
 
 public class IntegrationTest1
 {
     private static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(30);
+
+    [Fact]
+    public void SmokeTest()
+    {
+        // Simple smoke test to ensure test discovery works
+        Assert.True(true, "Test framework is working");
+    }
 
     // Instructions:
     // 1. Add a project reference to the target AppHost project, e.g.:
