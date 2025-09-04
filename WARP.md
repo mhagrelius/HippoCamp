@@ -41,8 +41,7 @@ aspire run
 dotnet test
 ```
 
-**Aspire Dashboard:** Opens automatically at `https://localhost:17134` (HTTPS) or `http://localhost:15170` (HTTP)
-
+**Aspire Dashboard:** Opens automatically; use the URL printed by AppHost in the console (ports may vary per machine).
 ## Essential Development Commands
 
 ### Building & Restoring
