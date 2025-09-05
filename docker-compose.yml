@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: hippocamp-postgres
+    environment:
+      POSTGRES_DB: hippocampmemorystoredb
+      POSTGRES_USER: hippocamp
+      POSTGRES_PASSWORD: dev-password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - hippocamp-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hippocamp -d hippocampmemorystoredb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  postgres_data:
+
+networks:
+  hippocamp-network:
+    driver: bridge
