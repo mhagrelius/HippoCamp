@@ -13,6 +13,7 @@ namespace HippoCamp.MemoryStore.Models;
 [Index(nameof(Created))]
 [Index(nameof(LastAccessed))]
 [Index(nameof(IsDeprecated))]
+[Index(nameof(IsDeleted))]
 public class Memory
 {
     /// <summary>
@@ -65,4 +66,15 @@ public class Memory
     /// Indicates if this memory is deprecated and should not be used.
     /// </summary>
     public bool IsDeprecated { get; set; } = false;
+
+    /// <summary>
+    /// Soft delete flag - memory is logically deleted but retained for retention period.
+    /// </summary>
+    public bool IsDeleted { get; set; } = false;
+
+    /// <summary>
+    /// Timestamp when the memory was soft deleted.
+    /// Null if memory is not deleted.
+    /// </summary>
+    public DateTime? DeletedAt { get; set; }
 }
