@@ -11,7 +11,7 @@ var postgres = builder.AddPostgres("postgresql", port: 5432)
 var memoryStoreDb = postgres.AddDatabase("memorystore");
 
 // Add the MemoryStore service with reference to the database
-var memoryStore = builder.AddProject<Projects.HippoCamp_MemoryStore>("memorystore")
+var memoryStore = builder.AddProject<Projects.HippoCamp_MemoryStore>("memorystore-api")
     .WithReference(memoryStoreDb)
     .WaitFor(postgres);
 
